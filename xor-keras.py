@@ -1,30 +1,25 @@
-#from __future__ import absolute_import, division, print_function, unicode_literals
-
 import tensorflow as tf #Подключаем модуль Тензорфлоу
-from tensorflow import keras
-from tensorflow.keras import layers
+import numpy as np #Импортируем нампи для создания массивов
 
-model = tf.keras.Sequential([
-# Adds a densely-connected layer with 64 units to the model:
-layers.Dense(64, activation='relu', input_dim=2),
-# Add another:
-layers.Dense(1, activation='sigmoid')])
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR) #Убираем лишние предупреждения
 
+model = tf.keras.Sequential([ #Создаём модель последовательных слоёв для обучения
+#Функция активации этого слоя для одномерных данных - выпрямитель
+tf.keras.layers.Dense(64, activation='relu', input_dim=2), #Второй слой принимает двухмерного инпут (вход+выход) и передаёт результаты 64 нейронам (спрятанный слой)
+#Функция активации этого слоя для одномерных данных - сигмоида
+tf.keras.layers.Dense(1, activation='sigmoid')]) #Третий слой принимает инфу из 64 нейронов спрятанного слоя и выдаёт результат на 1 нейрон
 
-model.compile(optimizer=tf.compat.v1.train.AdamOptimizer(0.01),
-              loss='mse',       # mean squared error
-              metrics=['mae'])  # mean absolute error
+#Добавляем конфигурацию к модели
+model.compile(optimizer=tf.compat.v1.train.AdamOptimizer(0.01), #Используем в нашей модели оптимизатор Адама с шагом в 0.01
+              loss='mse',       #Функция потери - среднее квадратичное ошибки
+              metrics=['binary_accuracy'])  #Собираем метрику - бинарная точность, вероятность, что модель выберет "правильный" результат
 
-import numpy as np
+data = np.array([[0,0],[0,1],[1,0],[1,1]], "float32") #4 разных входных состояний в виде двухмерного массива
 
-# the four different states of the XOR gate
-data = np.array([[0,0],[0,1],[1,0],[1,1]], "float32")
+labels = np.array([[0],[1],[1],[0]], "float32") #4 выхода, соответствующим входным данным
 
-# the four expected results in the same order
-labels = np.array([[0],[1],[1],[0]], "float32")
+model.fit(data, labels, epochs=10, verbose=2) #Обучение модели, 50 эпох, размер набора по дефолту 32, печатаем 1 линию для каждой эпохи
 
-model.fit(data, labels, epochs=50, batch_size=1)
+model.evaluate(data, labels, batch_size=1) #Оценка модели
 
-model.evaluate(data, labels, batch_size=1)
-
-print(model.predict(data, batch_size=1))
+print(model.predict(data, batch_size=1).round()) #Предсказание наученной моделью результатов, округление до единиц
