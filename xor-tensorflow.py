@@ -30,11 +30,11 @@ labels = np.array([[0],[1],[1],[0]], "float32")
 
 init = tf.compat.v1.global_variables_initializer()
 
-sess = tf.compat.v1.Session()
-
-sess.run(init)
-
-for epoch in range(10001):
-    sess.run(train_step, feed_dict={X: data, Y: labels})
-    if epoch == 10000:
-        print('loss:', sess.run(loss, feed_dict={X: data, Y: labels}))
+with tf.compat.v1.Session() as sess:
+    sess.run(init)
+    for epoch in range(10):
+        for element in range(32):
+            sess.run(train_step, {X: data, Y: labels})
+        #if (epoch + 1) % 10 == 0:
+        print('Epoch:', epoch + 1)
+        print('loss:', sess.run(loss, {X: data, Y: labels}))
