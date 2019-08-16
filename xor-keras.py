@@ -19,7 +19,8 @@ data = np.array([[0,0],[0,1],[1,0],[1,1]], "float32") #4 разных входн
 labels = np.array([[0],[1],[1],[0]], "float32") #4 выхода, соответствующим входным данным
 
 model.fit(data, labels, epochs=10, verbose=2) #Обучение модели, 10 эпох, размер набора по дефолту 32, печатаем 1 линию для каждой эпохи
-
+model.save('my_model.h5')
+#model = tf.keras.models.load_model('my_model.h5')
 model.evaluate(data, labels, batch_size=1) #Оценка модели
 
 print(model.predict(data, batch_size=1).round()) #Предсказание наученной моделью результатов, округление до единиц
