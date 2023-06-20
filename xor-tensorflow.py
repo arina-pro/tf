@@ -3,6 +3,7 @@ from tensorflow.compat.v1 import logging, placeholder, global_variables_initiali
 from tensorflow import Variable, random, zeros, name_scope, nn, matmul, sigmoid, reduce_mean, Graph
 from tensorflow.compat.v1.train import GradientDescentOptimizer, Saver
 from numpy import array, square
+from matplotlib import pyplot as plt
 
 logging.set_verbosity(logging.ERROR) #Не показываем лишние предупреждения
 
@@ -39,11 +40,19 @@ with Graph().as_default(): #Открываем граф как главный
 
     with Session() as sess: #Открываем сессию
         sess.run(init) #Инициализируем переменные
-        for epoch in range(10):
+        losses = []
+        for epoch in range(100):
             for element in range(32):
                 sess.run(train_step, {X: data, Y: labels}) #Обучаем модель на данных
             #if (epoch + 1) % 10 == 0:
             print('Epoch:', epoch + 1) #Эпоха обучения, каждые 32 шага
-            print('loss:', sess.run(loss, {X: data, Y: labels})) #Выводим ошибку после каждой эпохи обучения
+            cur_loss = sess.run(loss, {X: data, Y: labels})
+            losses.append(cur_loss)
+            print('loss:', cur_loss) #Выводим ошибку после каждой эпохи обучения
             save_path = saver.save(sess, "/tmp/model.ckpt") #Сохраняем чекпоинт каждую эпоху
         print("Model saved in path: %s" % save_path) #Где найти сохранённую "модель"
+        plt.plot(range(1, 101), losses)
+        plt.xlabel('Epoch')
+        plt.ylabel('MSE')
+        #plt.savefig('losses_plot.png')
+        plt.show()
